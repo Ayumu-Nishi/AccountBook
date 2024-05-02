@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">AccountBook</string>
+    <string name="registerButton">ユーザー登録</string>>
+    <string name="loginButton">ログイン</string>
+</resources>
