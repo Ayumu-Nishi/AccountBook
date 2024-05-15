@@ -1,5 +1,28 @@
 <resources>
+    <!-- アプリ全体 -->
     <string name="app_name">AccountBook</string>
+    <!-- 01_登録・ログイン選択画面 -->
     <string name="registerButton">ユーザー登録</string>>
     <string name="loginButton">ログイン</string>
+    <!-- 02_登録画面 -->
+    <string name="mailAddressLabel">メールアドレス</string>
+    <string name="mailAddressPlaceHolder">メールアドレスを入力してください</string>
+    <string name="passwordLabel">パスワード</string>
+    <string name="passwordPlaceHolder">パスワードを入力してください</string>
+    <string name="birthdayLabel">生年月日</string>
+    <string name="birthdayPlaceHolder">生年月日を選択してください</string>
+    <string name="birthdaySelectButton">選択</string>
+    <string name="agreementLabel">利用規約に同意します</string>
+    <string name="signUpButton">登録</string>
+    <string name="validError.mailAddress.blank">メールアドレスの入力が必要です</string>
+    <string name="validError.mailAddress.form">メールアドレスの形式で入力してください</string>
+    <string name="validError.password.blank">パスワードの設定が必要です</string>
+    <string name="validError.password.length">パスワードは８文字以上で設定してください</string>
+    <string name="validError.birthday.blank">生年月日の選択が必要です</string>
+    <string name="validError.agreement.false">利用規約に同意しないとアプリはご利用になれません</string>
+    <!-- 03_認証コード入力画面 -->
+    <!-- 04_ログイン画面 -->
+    <!-- 05_入出金明細画面 -->
+    <!-- 06_入手金登録・編集画面 -->
+    <!-- 07_収支画面 -->
 </resources>

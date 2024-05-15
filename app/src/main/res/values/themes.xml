@@ -6,4 +6,10 @@
     </style>
 
     <style name="Theme.AccountBook" parent="Base.Theme.AccountBook" />
+
+    <!-- editTextの下線の設定 -->
+    <style name="EditTextStyle" parent="Widget.AppCompat.EditText">
+        <item name="colorControlNormal">#777777</item>  <!-- 非フォーカス時 -->
+        <item name="colorControlActivated">#000000</item>  <!-- フォーカス時 -->
+    </style>
 </resources>
