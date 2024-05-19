@@ -1,4 +1,4 @@
-package com.example.accountbook
+package com.example.accountbook.common
 
 import android.app.AlertDialog
 import android.app.DatePickerDialog
@@ -7,6 +7,7 @@ import android.icu.util.Calendar
 import android.os.Bundle
 import android.widget.DatePicker
 import androidx.fragment.app.DialogFragment
+import com.example.accountbook.RegisterActivity
 
 
 class DatePick: DialogFragment(), DatePickerDialog.OnDateSetListener{

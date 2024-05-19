@@ -12,7 +12,8 @@
     <string name="birthdayLabel">生年月日</string>
     <string name="birthdayPlaceHolder">生年月日を選択してください</string>
     <string name="birthdaySelectButton">選択</string>
-    <string name="agreementLabel">利用規約に同意します</string>
+    <string name="agreementLabel">利用規約</string>
+    <string name="agreementCheckBoxLabel">利用規約に同意します</string>
     <string name="signUpButton">登録</string>
     <string name="validError.mailAddress.blank">メールアドレスの入力が必要です</string>
     <string name="validError.mailAddress.form">メールアドレスの形式で入力してください</string>

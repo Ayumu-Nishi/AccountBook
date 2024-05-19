@@ -1,16 +1,27 @@
 package com.example.accountbook
 
+import android.app.Activity
 import android.app.DatePickerDialog
 import android.content.Intent
+import android.graphics.Rect
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.MotionEvent
+import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.webkit.WebView
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.DatePicker
 import android.widget.EditText
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
+import com.example.accountbook.common.DatePick
 
 class RegisterActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
+
+    private var lastEventAction: Int? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
@@ -27,14 +38,56 @@ class RegisterActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
         signUpButton.setOnClickListener {
             signUp()
         }
+
+        // 利用規約のwebView
+        val webView = findViewById<WebView>(R.id.agreementWebView)
+        webView.loadUrl("https://developer.android.com/?hl=ja")
     }
 
+    // 生年月日ピッカーで選択した日付を取得して、ラベルに表示する処理
     override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
         val birthdayDisplayLabel = findViewById<TextView>(R.id.birthdayDisplayLabel)
         val selectedDate = "$year/${month.plus(1)}/$dayOfMonth"
         birthdayDisplayLabel.text = selectedDate
     }
 
+    // タッチイベント
+    // スクロール以外のタッチイベントでキーボードを閉じるように設定
+    override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
+        // スクロール時のタップを無視させる
+        if (lastEventAction != MotionEvent.ACTION_MOVE && event?.action == MotionEvent.ACTION_UP) {
+            val mailAddressEditText = findViewById<EditText>(R.id.editTextEmailAddress)
+            val passwordEditText = findViewById<EditText>(R.id.editTextPassword)
+            if (!isEditTextTouch(event.rawX.toInt(), event.rawY.toInt(), mailAddressEditText, passwordEditText)) {
+                // タップ位置がEditText以外の場合
+                // キーボードを非表示にして、フォーカスを外す
+                val constraintLayout = findViewById<ConstraintLayout>(R.id.registerConstraintLayout)
+                hideKeyboard(constraintLayout)
+            }
+        }
+        lastEventAction = event?.action
+        return super.dispatchTouchEvent(event)
+    }
+
+    // EditTextが選択状態かどうかを判定
+    private fun isEditTextTouch(touchRawX: Int, touchRawY: Int, vararg editText: EditText): Boolean {
+        return editText.any {
+            val areaOutsideFocusedView = Rect()
+            it.getGlobalVisibleRect(areaOutsideFocusedView)
+            // 対象のEditTextの表示領域内のタップであるか判定
+            return@any areaOutsideFocusedView.contains(touchRawX, touchRawY)
+        }
+    }
+
+    // キーボード非表示処理
+    private fun hideKeyboard(view: View) {
+        val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(view.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+        view.clearFocus()
+    }
+
+    // 登録ボタン押下時の処理
+    // サインイン処理
     private fun signUp() {
         // 入力チェック
         if (isValidate()) {
@@ -65,7 +118,7 @@ class RegisterActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
         }
 
         // パスワードの入力チェック
-        val passwordEditText = findViewById<EditText>(R.id.editTextTextPassword)
+        val passwordEditText = findViewById<EditText>(R.id.editTextPassword)
         val passwordText = passwordEditText.text.toString()
         val passwordErrorLabel = findViewById<TextView>(R.id.passwordErrorLabel)
         if (passwordText.isEmpty()) {
