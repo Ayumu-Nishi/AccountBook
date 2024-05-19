@@ -17,12 +17,23 @@ class DatePick: DialogFragment(), DatePickerDialog.OnDateSetListener{
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH)
         val day = calendar.get(Calendar.DAY_OF_MONTH)
-
-        return DatePickerDialog(requireContext(), AlertDialog.THEME_HOLO_LIGHT, activity as RegisterActivity, year, month, day)
+        // depreacatedなのでいつか修正したいが対案がない（公式が置き換え先に指定しているものはドラムロールはなさそう）
+        val datePickerDialog = DatePickerDialog(requireContext(), AlertDialog.THEME_HOLO_LIGHT ,activity as RegisterActivity, year, month, day)
+        datePickerDialog.datePicker.minDate = getBeforeYear(-120) // 120年前
+        datePickerDialog.datePicker.maxDate = System.currentTimeMillis() // 現在
+        return datePickerDialog
     }
 
     override fun onDateSet(view: DatePicker?, year: Int, month: Int, day: Int) {
         // Activity側でoverrideすること
+    }
+
+    // TODO: 共通クラスに移動しても良い
+    // 現在から過去に指定の年数遡った時のカレンダーの値を取得
+    private fun getBeforeYear(int: Int): Long {
+        val calender = Calendar.getInstance()
+        calender.add(Calendar.YEAR, int)
+        return calender.timeInMillis
     }
 
 }
