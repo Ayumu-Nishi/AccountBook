@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".MyApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -14,14 +15,30 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AccountBook"
         tools:targetApi="31">
+        <!-- 04_ログイン画面 -->
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false" />
+        <!-- ログイン後のホーム画面 -->
+        <activity
+            android:name=".HomeActivity"
+            android:exported="false" />
+        <!-- 03_認証コード入力画面 -->
         <activity
             android:name=".AuthcodeActivity"
             android:exported="false" />
+        <!-- 02_登録画面 -->
         <activity
             android:name=".RegisterActivity"
             android:exported="false" />
+        <!-- 01_登録・ログイン選択画面 -->
         <activity
             android:name=".StartActivity"
+            android:exported="false"
+            android:theme="@style/Theme.NoActionBar" />
+        <!-- Root -->
+        <activity
+            android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

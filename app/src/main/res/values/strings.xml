@@ -1,10 +1,12 @@
 <resources>
     <!-- アプリ全体 -->
     <string name="app_name">AccountBook</string>
+    <string name="logoutButton">ログアウト</string>
     <!-- 01_登録・ログイン選択画面 -->
     <string name="registerButton">ユーザー登録</string>>
     <string name="loginButton">ログイン</string>
     <!-- 02_登録画面 -->
+    <string name="registerActivityTitle">ユーザー登録</string>
     <string name="mailAddressLabel">メールアドレス</string>
     <string name="mailAddressPlaceHolder">メールアドレスを入力してください</string>
     <string name="passwordLabel">パスワード</string>
@@ -23,7 +25,10 @@
     <string name="validError.agreement.false">利用規約に同意しないとアプリはご利用になれません</string>
     <!-- 03_認証コード入力画面 -->
     <!-- 04_ログイン画面 -->
+    <string name="LoginActivityTitle">ログイン</string>
+    <string name="signInButton">ログイン</string>
     <!-- 05_入出金明細画面 -->
+    <string name="homeActivityTitle">家計簿</string>
     <!-- 06_入手金登録・編集画面 -->
     <!-- 07_収支画面 -->
 </resources>

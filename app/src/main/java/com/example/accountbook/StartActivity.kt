@@ -29,6 +29,7 @@ class StartActivity : AppCompatActivity() {
 
     //04_ログイン画面への遷移処理
     private fun goToLoginActivity() {
-
+        val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
     }
 }

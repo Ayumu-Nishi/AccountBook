@@ -21,10 +21,17 @@ import com.example.accountbook.common.DatePick
 class RegisterActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
 
     private var lastEventAction: Int? = null
+    private var mailAddressText: String = ""
+    private var passwordText: String = ""
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
+
+        // アクションバーに戻るボタンを表示
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.title = getString(R.string.registerActivityTitle)
 
         // 生年月日選択ボタン
         val birthdaySelectButton = findViewById<Button>(R.id.birthdaySelectButton)
@@ -91,8 +98,8 @@ class RegisterActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
     private fun signUp() {
         // 入力チェック
         if (isValidate()) {
-            // ログイン処理
-            goToAuthcodeActivity()
+            // サインイン処理
+
         }
     }
 
@@ -101,7 +108,7 @@ class RegisterActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
         var isValid = true
         // メールアドレスの入力チェック
         val mailAddressEditText = findViewById<EditText>(R.id.editTextEmailAddress)
-        val mailAddressText = mailAddressEditText.text.toString()
+        mailAddressText = mailAddressEditText.text.toString()
         val mailAddressErrorLabel = findViewById<TextView>(R.id.mailAdressErrorLabel)
         if (mailAddressText.isEmpty()) {
             // エラーメッセージの表示
@@ -119,7 +126,7 @@ class RegisterActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
 
         // パスワードの入力チェック
         val passwordEditText = findViewById<EditText>(R.id.editTextPassword)
-        val passwordText = passwordEditText.text.toString()
+        passwordText = passwordEditText.text.toString()
         val passwordErrorLabel = findViewById<TextView>(R.id.passwordErrorLabel)
         if (passwordText.isEmpty()) {
             // エラーメッセージの表示
@@ -162,9 +169,15 @@ class RegisterActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
         return isValid
     }
 
-    // 03_認証コード入力画面への遷移処理
-    private fun goToAuthcodeActivity() {
-        val intent = Intent(this, AuthcodeActivity::class.java)
+    // 05_入出金明細画面への遷移処理
+    private fun goToHomeActivity() {
+        val intent = Intent(this, HomeActivity::class.java)
         startActivity(intent)
+    }
+
+    // 戻るボタン押下時の処理
+    override fun onSupportNavigateUp(): Boolean {
+            onBackPressedDispatcher.onBackPressed()
+        return true
     }
 }
