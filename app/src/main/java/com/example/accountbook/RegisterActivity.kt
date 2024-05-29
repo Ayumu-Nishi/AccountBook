@@ -15,12 +15,19 @@ import android.widget.CheckBox
 import android.widget.DatePicker
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.accountbook.common.DatePick
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 class RegisterActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
 
     private var lastEventAction: Int? = null
+    private val auth = Firebase.auth
     private var mailAddressText: String = ""
     private var passwordText: String = ""
 
@@ -99,7 +106,30 @@ class RegisterActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
         // 入力チェック
         if (isValidate()) {
             // サインイン処理
-
+            auth.createUserWithEmailAndPassword(mailAddressText, passwordText)
+                .addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful) {
+                        goToHomeActivity()
+                    } else {
+                        val exception = task.exception
+                        var message: String = "Other exception occurred"
+                        if (exception is FirebaseAuthWeakPasswordException) {
+                            // パスワードが弱すぎる場合の処理
+                            message = "Weak password"
+                        } else if (exception is FirebaseAuthInvalidCredentialsException) {
+                            // メールアドレスが不正な場合
+                            message = "invalid mailAddress"
+                        } else if (exception is FirebaseAuthUserCollisionException) {
+                            // すでに該当のメールアドレスのユーザーが存在する場合
+                            message = "existed mailAddress"
+                        }
+                        Toast.makeText(
+                            baseContext,
+                            message,
+                            Toast.LENGTH_SHORT,
+                        ).show()
+                    }
+                }
         }
     }
 

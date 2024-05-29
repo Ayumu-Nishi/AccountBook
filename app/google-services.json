@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "567000229967",
+    "project_id": "accountbook-b97bb",
+    "storage_bucket": "accountbook-b97bb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:567000229967:android:47ecdb5a1ffd0ed1f3623a",
+        "android_client_info": {
+          "package_name": "com.example.accountbook"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyABjNaeIFAj-cnT8BX9tBTpYITp8LkD5os"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,13 +1,16 @@
 package com.example.accountbook
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 
 
 class HomeActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
@@ -37,10 +40,28 @@ class HomeActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.logout_button -> {
-                // ボタンがクリックされた時の処理を記述
+                AlertDialog.Builder(this) // FragmentではActivityを取得して生成
+                    .setTitle("ログアウトしますか？")
+                    .setMessage("")
+                    .setPositiveButton("OK") { dialog, which ->
+                        // ログアウトする
+                        singOut()
+                    }
+                    .setNegativeButton("キャンセル") { dialog, which ->
+                        // 何もしない
+                    }
+                    .show()
+
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun singOut() {
+        val myApp = applicationContext as MyApplication
+        myApp.auth.signOut()
+        startActivity(Intent(this, StartActivity::class.java))
+        finish()
     }
 }
