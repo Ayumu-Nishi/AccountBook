@@ -101,15 +101,15 @@ class RegisterActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
     }
 
     // 登録ボタン押下時の処理
-    // サインイン処理
+    // 登録処理
     private fun signUp() {
         // 入力チェック
         if (isValidate()) {
-            // サインイン処理
+            // 登録処理
             auth.createUserWithEmailAndPassword(mailAddressText, passwordText)
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
-                        goToHomeActivity()
+                        goToAuthCodeActivity()
                     } else {
                         val exception = task.exception
                         var message: String = "Other exception occurred"
@@ -200,8 +200,8 @@ class RegisterActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
     }
 
     // 05_入出金明細画面への遷移処理
-    private fun goToHomeActivity() {
-        val intent = Intent(this, HomeActivity::class.java)
+    private fun goToAuthCodeActivity() {
+        val intent = Intent(this, AuthcodeActivity::class.java)
         startActivity(intent)
     }
 

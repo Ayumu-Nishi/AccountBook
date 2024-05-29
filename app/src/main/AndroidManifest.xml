@@ -23,7 +23,7 @@
         <activity
             android:name=".HomeActivity"
             android:exported="false" />
-        <!-- 03_認証コード入力画面 -->
+        <!-- 03_認証メール送信画面 -->
         <activity
             android:name=".AuthcodeActivity"
             android:exported="false" />
@@ -44,6 +44,14 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:host="accountbook20240530.page.link"
+                    android:scheme="https" />
             </intent-filter>
         </activity>
     </application>

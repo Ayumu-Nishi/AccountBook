@@ -71,7 +71,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     // サインイン処理
-    fun signIn() {
+    private fun signIn() {
         val mailAddressEditText = findViewById<EditText>(R.id.editTextEmailAddress)
         mailAddressText = mailAddressEditText.text.toString()
         val passwordEditText = findViewById<EditText>(R.id.editTextPassword)
@@ -79,7 +79,7 @@ class LoginActivity : AppCompatActivity() {
         auth.signInWithEmailAndPassword(mailAddressText, passwordText)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    goToHomeActivity()
+                    goToAuthcodeActivity()
                 } else {
                     // セキュリティ上Exceptionの情報は隠蔽する
                     Toast.makeText(
@@ -91,9 +91,9 @@ class LoginActivity : AppCompatActivity() {
             }
     }
 
-    // 05_入出金明細画面への遷移処理
-    private fun goToHomeActivity() {
-        val intent = Intent(this, HomeActivity::class.java)
+    // 03_認証メール送信画面への遷移処理
+    private fun goToAuthcodeActivity() {
+        val intent = Intent(this, AuthcodeActivity::class.java)
         startActivity(intent)
     }
 
