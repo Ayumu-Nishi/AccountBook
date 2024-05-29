@@ -25,7 +25,7 @@
     <string name="validError.agreement.false">利用規約に同意しないとアプリはご利用になれません</string>
     <!-- 03_認証メール送信画面 -->
     <string name="authcodeActivityTitle">メールアドレス確認</string>
-    <string name="afterSendingText">確認メールを送信しました。\nメールをご確認いただき、掲載のリンクを押下して登録を完了してください。\nその後、ログイン画面からログインしてください。</string>
+    <string name="afterSendingText">メールアドレスの本人確認が完了していません。\n確認メールを送信しましたので、ご確認いただき、掲載のリンクを押下して登録を完了してください。\nその後、ログイン画面から再度ログインしてください。</string>
     <string name="failureSendingText">確認メールの送信に失敗しました。再送ボタンを押してください。</string>
     <string name="afterSendingButtonTitle">ログイン画面へ</string>
     <string name="resendButtonTitle">再送</string>
