@@ -115,13 +115,13 @@ class RegisterActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
                         var message: String = "Other exception occurred"
                         if (exception is FirebaseAuthWeakPasswordException) {
                             // パスワードが弱すぎる場合の処理
-                            message = "Weak password"
+                            message = getString(R.string.firebaseException_weakPassword)
                         } else if (exception is FirebaseAuthInvalidCredentialsException) {
                             // メールアドレスが不正な場合
-                            message = "invalid mailAddress"
+                            message = getString(R.string.firebaseException_invalidMailAddress)
                         } else if (exception is FirebaseAuthUserCollisionException) {
                             // すでに該当のメールアドレスのユーザーが存在する場合
-                            message = "existed mailAddress"
+                            message = getString(R.string.firebaseException_existedMailAddress)
                         }
                         Toast.makeText(
                             baseContext,

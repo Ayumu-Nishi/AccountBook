@@ -23,6 +23,9 @@
     <string name="validError.password.length">パスワードは８文字以上で設定してください</string>
     <string name="validError.birthday.blank">生年月日の選択が必要です</string>
     <string name="validError.agreement.false">利用規約に同意しないとアプリはご利用になれません</string>
+    <string name="firebaseException.weakPassword">エラー！パスワードが脆弱です</string>
+    <string name="firebaseException.invalidMailAddress">エラー！メールアドレスが不正です</string>
+    <string name="firebaseException.existedMailAddress">エラー！既に登録済みの可能性があります</string>
     <!-- 03_認証メール送信画面 -->
     <string name="authcodeActivityTitle">メールアドレス確認</string>
     <string name="afterSendingText">メールアドレスの本人確認が完了していません。\n確認メールを送信しましたので、ご確認いただき、掲載のリンクを押下して登録を完了してください。\nその後、ログイン画面から再度ログインしてください。</string>
