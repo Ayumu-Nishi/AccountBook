@@ -7,6 +7,11 @@ import android.view.MenuItem
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.findNavController
+import androidx.navigation.ui.setupWithNavController
+import androidx.navigation.fragment.NavHostFragment.Companion.findNavController
+import androidx.navigation.ui.NavigationUI.setupWithNavController
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 
 class HomeActivity : AppCompatActivity() {
@@ -16,6 +21,9 @@ class HomeActivity : AppCompatActivity() {
         setContentView(R.layout.activity_home)
 
         supportActionBar?.title = getString(R.string.homeActivityTitle)
+
+        val navController = findNavController(R.id.nav_host_fragment)
+        findViewById<BottomNavigationView>(R.id.bottomNavigation).setupWithNavController(navController)
 
         // addCallbackでコールバックを追加
         onBackPressedDispatcher.addCallback(callback)

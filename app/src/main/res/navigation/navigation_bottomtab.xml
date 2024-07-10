@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/navigation_bottomtab"
+    app:startDestination="@id/navigation_transaction">
+    <fragment android:id="@+id/navigation_transaction"
+        android:name="com.example.accountbook.TransactionFragment"
+        android:label="TransactionFragment"/>
+    <fragment android:id="@+id/navigation_balance"
+        android:name="com.example.accountbook.BalanceFragment"
+        android:label="BalanceFragment"/>
+</navigation>

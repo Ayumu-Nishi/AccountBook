@@ -5,6 +5,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <!-- Fragment を表示する領域 -->
+    <fragment
+        android:id="@+id/nav_host_fragment"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        app:navGraph="@navigation/navigation_bottomtab"/>
+
     <FrameLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
