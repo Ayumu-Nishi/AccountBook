@@ -2,6 +2,8 @@
     <!-- アプリ全体 -->
     <string name="app_name">AccountBook</string>
     <string name="logoutButton">ログアウト</string>
+    <string name="actionBar.leftButtonTitle">取消</string>
+    <string name="actionBar.rightButtonTitle">保存</string>
     <!-- 01_登録・ログイン選択画面 -->
     <string name="registerButton">ユーザー登録</string>>
     <string name="loginButton">ログイン</string>
@@ -38,5 +40,6 @@
     <!-- 05_入出金明細画面 -->
     <string name="homeActivityTitle">家計簿</string>
     <!-- 06_入手金登録・編集画面 -->
+    <string name="TransactionEditActivityTitle">入出金登録・編集</string>
     <!-- 07_収支画面 -->
 </resources>

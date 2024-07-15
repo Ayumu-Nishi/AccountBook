@@ -15,13 +15,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AccountBook"
         tools:targetApi="31">
-        <!-- 04_ログイン画面 -->
+        <!-- 06_入出金登録・編集画面 -->
         <activity
-            android:name=".LoginActivity"
+            android:name=".TransactionEditActivity"
             android:exported="false" />
         <!-- ログイン後のホーム画面 -->
         <activity
             android:name=".HomeActivity"
+            android:exported="false" />
+        <!-- 04_ログイン画面 -->
+        <activity
+            android:name=".LoginActivity"
             android:exported="false" />
         <!-- 03_認証メール送信画面 -->
         <activity
@@ -36,6 +40,10 @@
             android:name=".StartActivity"
             android:exported="false"
             android:theme="@style/Theme.NoActionBar" />
+        <!-- 親クラス -->
+        <activity
+            android:name=".ParentActivity"
+            android:exported="false" />
         <!-- Root -->
         <activity
             android:name=".MainActivity"
@@ -47,8 +55,10 @@
             </intent-filter>
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
                     android:host="accountbook20240530.page.link"
                     android:scheme="https" />

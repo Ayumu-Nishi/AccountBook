@@ -9,18 +9,14 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
-import androidx.navigation.fragment.NavHostFragment.Companion.findNavController
-import androidx.navigation.ui.NavigationUI.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : ParentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
-
-        supportActionBar?.title = getString(R.string.homeActivityTitle)
 
         val navController = findNavController(R.id.nav_host_fragment)
         findViewById<BottomNavigationView>(R.id.bottomNavigation).setupWithNavController(navController)
@@ -29,40 +25,40 @@ class HomeActivity : AppCompatActivity() {
         onBackPressedDispatcher.addCallback(callback)
     }
 
+    override fun getActionBarConfig(): ActionBarConfig {
+        return ActionBarConfig(
+            title = getString(R.string.homeActivityTitle),
+            leftDisplayMode = ActionBarDisplayMode.NONE,
+            leftIconResId = null,
+            leftText = null,
+            rightDisplayMode = ActionBarDisplayMode.ICON,
+            rightIconResId = R.drawable.logout,
+            rightText = null
+        )
+    }
+
+    // ログアウトボタン押下時
+    override fun onRightContainerClicked() {
+        super.onRightContainerClicked()
+        AlertDialog.Builder(this) // FragmentではActivityを取得して生成
+            .setTitle("ログアウトしますか？")
+            .setMessage("")
+            .setPositiveButton("OK") { dialog, which ->
+                // ログアウトする
+                singOut()
+            }
+            .setNegativeButton("キャンセル") { dialog, which ->
+                // 何もしない
+            }
+            .show()
+    }
+
     //OnBackPressedCallbackのコンストラクタはtrueにすることでコールバックを有効にする
     private val callback = object : OnBackPressedCallback(true) {
         //コールバックのhandleOnBackPressedを呼び出して、戻るキーを押したときの処理を記述
         override fun handleOnBackPressed() {
             // 戻るキーを無効にする＝処理を書かない
             return
-        }
-    }
-
-    // ログアウトボタンを追加するためのメニューの設定
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_home, menu)
-        return true
-    }
-
-    // ログアウトボタン（メニューに配置したボタン）押下時の処理
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.logout_button -> {
-                AlertDialog.Builder(this) // FragmentではActivityを取得して生成
-                    .setTitle("ログアウトしますか？")
-                    .setMessage("")
-                    .setPositiveButton("OK") { dialog, which ->
-                        // ログアウトする
-                        singOut()
-                    }
-                    .setNegativeButton("キャンセル") { dialog, which ->
-                        // 何もしない
-                    }
-                    .show()
-
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
         }
     }
 

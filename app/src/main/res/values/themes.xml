@@ -20,4 +20,10 @@
         <item name="colorControlNormal">@color/gray</item>  <!-- 非フォーカス時 -->
         <item name="colorControlActivated">@color/black</item>  <!-- フォーカス時 -->
     </style>
+
+    <!-- FABを丸にする設定 -->
+    <style name="ShapeAppearanceOverlay.FAB" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
 </resources>

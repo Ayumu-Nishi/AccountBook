@@ -1,10 +1,12 @@
 package com.example.accountbook
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -18,6 +20,7 @@ private const val ARG_PARAM2 = "param2"
  */
 class TransactionFragment : Fragment() {
     // TODO: Rename and change types of parameters
+    private lateinit var fab: FloatingActionButton
     private var param1: String? = null
     private var param2: String? = null
 
@@ -34,7 +37,17 @@ class TransactionFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_transaction, container, false)
+        val view =  inflater.inflate(R.layout.fragment_transaction, container, false)
+
+        fab = view.findViewById(R.id.fab)
+        // 念の為、初期化チェック
+        if (::fab.isInitialized) {
+            fab.setOnClickListener {
+                val intent = Intent(requireActivity(), TransactionEditActivity::class.java)
+                startActivity(intent)
+            }
+        }
+        return view
     }
 
     companion object {
