@@ -24,7 +24,7 @@ import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
-class RegisterActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener {
+class RegisterActivity : AppCompatActivity(), DatePick.DatePickerListener {
 
     private var lastEventAction: Int? = null
     private val auth = Firebase.auth
@@ -59,7 +59,7 @@ class RegisterActivity : AppCompatActivity(), DatePickerDialog.OnDateSetListener
     }
 
     // 生年月日ピッカーで選択した日付を取得して、ラベルに表示する処理
-    override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
+    override fun onDateSet(year: Int, month: Int, dayOfMonth: Int) {
         val birthdayDisplayLabel = findViewById<TextView>(R.id.birthdayDisplayLabel)
         val selectedDate = "$year/${month.plus(1)}/$dayOfMonth"
         birthdayDisplayLabel.text = selectedDate

@@ -12,20 +12,38 @@ import com.example.accountbook.RegisterActivity
 
 class DatePick: DialogFragment(), DatePickerDialog.OnDateSetListener{
 
+    interface DatePickerListener {
+        fun onDateSet(year: Int, month: Int, day: Int)
+    }
+
+    private lateinit var listener: DatePickerListener
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val calendar = Calendar.getInstance()
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH)
         val day = calendar.get(Calendar.DAY_OF_MONTH)
         // depreacatedなのでいつか修正したいが対案がない（公式が置き換え先に指定しているものはドラムロールはなさそう）
-        val datePickerDialog = DatePickerDialog(requireContext(), AlertDialog.THEME_HOLO_LIGHT ,activity as RegisterActivity, year, month, day)
+        val datePickerDialog = DatePickerDialog(
+            requireContext(), AlertDialog.THEME_HOLO_LIGHT, this, year, month, day
+        )
         datePickerDialog.datePicker.minDate = getBeforeYear(-120) // 120年前
         datePickerDialog.datePicker.maxDate = System.currentTimeMillis() // 現在
         return datePickerDialog
     }
 
+    override fun onAttach(context: android.content.Context) {
+        super.onAttach(context)
+        try {
+            // 親アクティビティがリスナーを実装していることを確認
+            listener = context as DatePickerListener
+        } catch (e: ClassCastException) {
+            throw ClassCastException("$context must implement DatePickerListener")
+        }
+    }
+
     override fun onDateSet(view: DatePicker?, year: Int, month: Int, day: Int) {
-        // Activity側でoverrideすること
+        listener.onDateSet(year, month, day)
     }
 
     // TODO: 共通クラスに移動しても良い

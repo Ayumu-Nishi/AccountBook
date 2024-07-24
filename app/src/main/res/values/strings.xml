@@ -2,8 +2,8 @@
     <!-- アプリ全体 -->
     <string name="app_name">AccountBook</string>
     <string name="logoutButton">ログアウト</string>
-    <string name="actionBar.leftButtonTitle">取消</string>
-    <string name="actionBar.rightButtonTitle">保存</string>
+    <string name="actionBar.leftButtonTitle">＜</string>
+    <string name="actionBar.rightButtonTitle">削除</string>
     <!-- 01_登録・ログイン選択画面 -->
     <string name="registerButton">ユーザー登録</string>>
     <string name="loginButton">ログイン</string>
@@ -41,5 +41,25 @@
     <string name="homeActivityTitle">家計簿</string>
     <!-- 06_入手金登録・編集画面 -->
     <string name="TransactionEditActivityTitle">入出金登録・編集</string>
+    <string name="balanceTitleLabel">収支</string>
+    <string name="incomeRadioButtonTitle">収入</string>
+    <string name="expenseRadioButtonTitle">支出</string>
+    <string name="categoryTitleLabel">カテゴリ</string>
+    <string name="categoryDisplayLabel">カテゴリを選択してください</string>
+    <string name="categorySelectButton">選択</string>
+    <string name="dateTitleLabel">日付</string>
+    <string name="dateDisplayLabel">日付を選択してください</string>
+    <string name="dateSelectButton">選択</string>
+    <string name="amountTitleLabel">金額</string>
+    <string name="unitTitleLabel">円</string>
+    <string name="contentTitleLabel">内容</string>
+    <string name="transactionRegisterButton">登録</string>
+    <string name="validError.balance.null">収支の選択が必要です</string>
+    <string name="validError.category.null">カテゴリの選択が必要です</string>
+    <string name="validError.date.null">日付の選択が必要です</string>
+    <string name="validError.amount.null">金額の入力が必要です</string>
+    <string name="validError.content.null">内容の入力が必要です</string>
     <!-- 07_収支画面 -->
+    <!-- 共通 -->
+    <string name="commonEditTextPlaceHolder">入力してください</string>
 </resources>
