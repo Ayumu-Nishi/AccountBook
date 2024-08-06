@@ -49,7 +49,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/expenseRadioButtonTitle"
-                    android:textSize="18dp" />
+                    android:textSize="18dp"
+                    android:checked="true" />
 
                 <RadioButton
                     android:id="@+id/incomeRadioButton"

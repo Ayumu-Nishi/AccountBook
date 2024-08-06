@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     // Add the Google services Gradle plugin
     id 'com.google.gms.google-services'
+    id 'io.realm.kotlin'
 }
 
 android {
@@ -57,4 +58,11 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth-ktx'
     // Add the dependencies for the Dynamic Links
     implementation 'com.google.firebase:firebase-dynamic-links-ktx'
+
+    // Realm
+    implementation 'io.realm.kotlin:library-base:1.16.0'
+    // If using Device Sync
+    implementation 'io.realm.kotlin:library-sync:1.16.0'
+    // If using coroutines with the SDK
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0'
 }

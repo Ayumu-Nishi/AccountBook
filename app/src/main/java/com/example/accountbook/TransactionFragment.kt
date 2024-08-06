@@ -2,11 +2,20 @@ package com.example.accountbook
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
+import com.example.accountbook.Data.TransactionsData
+import com.example.accountbook.Entity.TransactionsEntity
+import com.example.accountbook.Service.TransactionsService
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import io.realm.kotlin.Realm
+import io.realm.kotlin.RealmConfiguration
+import kotlinx.coroutines.launch
+import java.util.logging.Logger
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -21,6 +30,9 @@ private const val ARG_PARAM2 = "param2"
 class TransactionFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private lateinit var fab: FloatingActionButton
+    val config = RealmConfiguration.Builder(schema = setOf(TransactionsEntity::class)).build()
+    val realm = Realm.open(config)
+    var transactionsDatas: List<TransactionsData> = listOf()
     private var param1: String? = null
     private var param2: String? = null
 
@@ -30,6 +42,7 @@ class TransactionFragment : Fragment() {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+        setData()
     }
 
     override fun onCreateView(
@@ -48,6 +61,13 @@ class TransactionFragment : Fragment() {
             }
         }
         return view
+    }
+
+    private fun setData() {
+        lifecycleScope.launch {
+            transactionsDatas = TransactionsService().getTransactions(realm)
+            Log.d("data", "${transactionsDatas.size}")
+        }
     }
 
     companion object {

@@ -1,9 +1,7 @@
 package com.example.accountbook
 
 import android.app.Activity
-import android.app.DatePickerDialog
 import android.graphics.Rect
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
@@ -11,20 +9,35 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
-import android.widget.DatePicker
 import android.widget.EditText
+import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.Spinner
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.lifecycle.lifecycleScope
+import com.example.accountbook.Data.TransactionsData
+import com.example.accountbook.Entity.TransactionsEntity
 import com.example.accountbook.common.DatePick
+import com.example.accountbook.Model.ActionBarConfig
+import com.example.accountbook.Model.ActionBarDisplayMode
+import com.example.accountbook.Service.TransactionsService
+import io.realm.kotlin.Realm
+import io.realm.kotlin.RealmConfiguration
+import kotlinx.coroutines.launch
 
 class TransactionEditActivity : ParentActivity(), DatePick.DatePickerListener {
 
-    var transactionId: String = ""
-    var transactionData: TransactionData = TransactionData()
+    // 前画面からの受け渡し＆画面内の入力データ保持用のクラス
+    var transactionsData: TransactionsData = TransactionsData()
+    // Realmインスタンス
+    val config = RealmConfiguration.Builder(schema = setOf(TransactionsEntity::class)).build()
+    val realm = Realm.open(config)
+    // タッチイベントの検知用
     private var lastEventAction: Int? = null
-    val categories = mapOf(
+    // 支出カテゴリ
+    val expensesCategories = mapOf(
         1 to "食費",
         2 to "日用品",
         3 to "趣味",
@@ -42,19 +55,53 @@ class TransactionEditActivity : ParentActivity(), DatePick.DatePickerListener {
         15 to "保険",
         16 to "その他"
     )
+
+    val incomeCategories = mapOf(
+        1 to "給料",
+        2 to "お小遣い",
+        3 to "年金",
+        4 to "立替",
+        5 to "不明",
+        6 to "その他"
+    )
+
+    var categories = expensesCategories
+
     private var selectedCategoryId: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_transaction_edit)
 
+        // 収支ラジオボタン
+        val radioGroup = findViewById<RadioGroup>(R.id.balanceRadioGroup)
+        val default = if (transactionsData.balanceType == 1) {
+            findViewById<RadioButton>(R.id.incomeRadioButton)
+        } else {
+            findViewById<RadioButton>(R.id.expenseRadioButton)
+        }
+        radioGroup.check(default.id)
+
         // カテゴリ選択ボタン
         val categorySpinner: Spinner = findViewById(R.id.categorySpinner)
 
+        // ラジオボタンの選択変更リスナーを設定
+        radioGroup.setOnCheckedChangeListener { _, checkedId ->
+            when (checkedId) {
+                R.id.incomeRadioButton -> {
+                    // "収入" が選択されている場合の処理
+                    categories = incomeCategories
+                }
+                else -> {
+                    // "支出" が選択されている場合の処理
+                    categories = expensesCategories
+                }
+            }
+            setCategory(categorySpinner)
+        }
+
         // Spinnerにカテゴリを設定
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categories.values.toList())
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        categorySpinner.adapter = adapter
+        setCategory(categorySpinner)
 
         categorySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
@@ -82,10 +129,15 @@ class TransactionEditActivity : ParentActivity(), DatePick.DatePickerListener {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        realm.close()
+    }
+
     override fun getActionBarConfig(): ActionBarConfig {
         var rightDisplayMode = ActionBarDisplayMode.NONE
         var rightText: String? = null
-        if (!transactionId.isBlank()) {
+        if (!transactionsData.transactionId.isBlank()) {
             // 編集の場合：削除ボタンを表示
             rightDisplayMode = ActionBarDisplayMode.TEXT
             rightText = getString(R.string.actionBar_rightButtonTitle)
@@ -100,6 +152,13 @@ class TransactionEditActivity : ParentActivity(), DatePick.DatePickerListener {
             rightText = rightText,
             rightIconResId = null
         )
+    }
+
+    // Spinnerにカテゴリを設定
+    private fun setCategory(spinner: Spinner) {
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categories.values.toList())
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner.adapter = adapter
     }
 
     // 生年月日ピッカーで選択した日付を取得して、ラベルに表示する処理
@@ -161,14 +220,13 @@ class TransactionEditActivity : ParentActivity(), DatePick.DatePickerListener {
         setData()
         if (isValidate()) {
             // Realmへの保存処理
-            // 画面を戻す
-            onBackPressedDispatcher.onBackPressed()
+            saveData()
         }
     }
 
     // modelDataへの格納
     private fun setData() {
-        var balanceType:Int? = null
+        var balanceType:Int = 0
         var categoryType:Int? = null
         var date:String? = null
         var amount:Int? = null
@@ -187,8 +245,8 @@ class TransactionEditActivity : ParentActivity(), DatePick.DatePickerListener {
                 balanceType = 1
             }
             else -> {
-                // 何も選択されていない場合の処理
-                balanceType = null
+                // 未選択もしくはそれ以外が選択されている場合
+                balanceType = 0
             }
         }
 
@@ -208,8 +266,8 @@ class TransactionEditActivity : ParentActivity(), DatePick.DatePickerListener {
         // 内容
         val contentEditText = findViewById<EditText>(R.id.contentEditText)
         content = contentEditText.text.toString()
-        transactionData = TransactionData(
-            transactionId = transactionId,
+        // transactionIdを除いてDataクラスに格納
+        transactionsData = transactionsData.copy(
             balanceType = balanceType,
             categoryType = categoryType,
             date = date,
@@ -222,37 +280,30 @@ class TransactionEditActivity : ParentActivity(), DatePick.DatePickerListener {
     // 入力チェック
     private fun isValidate(): Boolean {
         var isValid = true
-        // 収支の入力チェック
-        if (transactionData.balanceType == null) {
-            // 0か1以外というチェックでも良い
-            val errorLabel = findViewById<TextView>(R.id.balanceErrorLabel)
-            errorLabel.text = getString(R.string.validError_balance_null)
-            isValid = false
-        }
 
         // カテゴリの入力チェック
-        if (transactionData.categoryType == null) {
+        if (transactionsData.categoryType == null) {
             val errorLabel = findViewById<TextView>(R.id.categoryErrorLabel)
             errorLabel.text = getString(R.string.validError_balance_null)
             isValid = false
         }
 
         // 日付の入力チェック
-        if (transactionData.date == null) {
+        if (transactionsData.date == null) {
             val errorLabel = findViewById<TextView>(R.id.dateErrorLabel)
             errorLabel.text = getString(R.string.validError_date_null)
             isValid = false
         }
 
         // 金額の入力チェック
-        if (transactionData.amount == null) {
+        if (transactionsData.amount == null) {
             val errorLabel = findViewById<TextView>(R.id.amountErrorLabel)
             errorLabel.text = getString(R.string.validError_amount_null)
             isValid = false
         }
 
         // 内容の入力チェック
-        if (transactionData.content.isNullOrBlank()) {
+        if (transactionsData.content.isNullOrBlank()) {
             val errorLabel = findViewById<TextView>(R.id.contentErrorLabel)
             errorLabel.text = getString(R.string.validError_content_null)
             isValid = false
@@ -260,13 +311,18 @@ class TransactionEditActivity : ParentActivity(), DatePick.DatePickerListener {
 
         return isValid
     }
-}
 
-public data class TransactionData (
-    var transactionId:String = "",
-    var balanceType:Int? = null,
-    var categoryType:Int? = null,
-    var date:String? = null,
-    var amount:Int? = null,
-    var content:String? = null
-)
+    private fun saveData() {
+        lifecycleScope.launch {
+            TransactionsService().saveTransaction(realm, transactionsData)
+            AlertDialog.Builder(this@TransactionEditActivity)
+                .setTitle("登録完了")
+                .setPositiveButton("OK") { dialog, _ ->
+                    dialog.dismiss() // ダイアログを閉じる
+                    // 画面を戻す
+                    onBackPressedDispatcher.onBackPressed()
+                }
+                .show()
+        }
+    }
+}

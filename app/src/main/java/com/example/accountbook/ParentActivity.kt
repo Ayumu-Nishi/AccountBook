@@ -1,5 +1,7 @@
 package com.example.accountbook
 
+import com.example.accountbook.Model.ActionBarConfig
+import com.example.accountbook.Model.ActionBarDisplayMode
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -118,20 +120,4 @@ abstract class ParentActivity : AppCompatActivity() {
 
     // ActionBarの設定を取得する抽象メソッド
     abstract fun getActionBarConfig(): ActionBarConfig
-}
-
-data class ActionBarConfig(
-    val title: String = "",
-    val leftDisplayMode: ActionBarDisplayMode = ActionBarDisplayMode.NONE,
-    val leftIconResId: Int?,
-    val leftText: String?,
-    val rightDisplayMode: ActionBarDisplayMode = ActionBarDisplayMode.NONE,
-    val rightIconResId: Int?,
-    val rightText: String?
-)
-
-enum class ActionBarDisplayMode {
-    ICON,
-    TEXT,
-    NONE
 }

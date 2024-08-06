@@ -1,12 +1,11 @@
 package com.example.accountbook
 
+import com.example.accountbook.Model.ActionBarConfig
+import com.example.accountbook.Model.ActionBarDisplayMode
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -19,7 +18,9 @@ class HomeActivity : ParentActivity() {
         setContentView(R.layout.activity_home)
 
         val navController = findNavController(R.id.nav_host_fragment)
-        findViewById<BottomNavigationView>(R.id.bottomNavigation).setupWithNavController(navController)
+        findViewById<BottomNavigationView>(R.id.bottomNavigation).setupWithNavController(
+            navController
+        )
 
         // addCallbackでコールバックを追加
         onBackPressedDispatcher.addCallback(callback)
