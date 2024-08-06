@@ -1,6 +1,7 @@
 package com.example.accountbook.Service
 
 import com.example.accountbook.Data.TransactionsData
+import com.example.accountbook.Data.TransactionsGroupData
 import com.example.accountbook.Entity.TransactionsEntity
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
@@ -48,6 +49,12 @@ class TransactionsService {
             val entities = realm.query<TransactionsEntity>().find()
             entities.map { fromEntityToData(it) } // EntitiesをDataに変換
         }
+    }
+
+    fun groupTransactionsByDate(transactions: List<TransactionsData>): List<TransactionsGroupData> {
+        return transactions.groupBy { it.date }
+            .toSortedMap(compareByDescending { it }) // 日付を降順にソート
+            .map { TransactionsGroupData(it.key ?: "Unknown date", it.value) }
     }
 
 }

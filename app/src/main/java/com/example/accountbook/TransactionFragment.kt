@@ -8,7 +8,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.accountbook.Adapter.TransactionsAdapter
+import com.example.accountbook.Adapter.TransactionsGroupAdapter
 import com.example.accountbook.Data.TransactionsData
+import com.example.accountbook.Data.TransactionsGroupData
 import com.example.accountbook.Entity.TransactionsEntity
 import com.example.accountbook.Service.TransactionsService
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -17,31 +23,22 @@ import io.realm.kotlin.RealmConfiguration
 import kotlinx.coroutines.launch
 import java.util.logging.Logger
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [TransactionFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class TransactionFragment : Fragment() {
-    // TODO: Rename and change types of parameters
     private lateinit var fab: FloatingActionButton
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: TransactionsGroupAdapter
     val config = RealmConfiguration.Builder(schema = setOf(TransactionsEntity::class)).build()
     val realm = Realm.open(config)
     var transactionsDatas: List<TransactionsData> = listOf()
-    private var param1: String? = null
-    private var param2: String? = null
+    var transactionsGroupDatas: List<TransactionsGroupData> = listOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
+//        setData()
+    }
+
+    override fun onResume() {
+        super.onResume()
         setData()
     }
 
@@ -49,11 +46,15 @@ class TransactionFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        val view =  inflater.inflate(R.layout.fragment_transaction, container, false)
+        val view = inflater.inflate(R.layout.fragment_transaction, container, false)
 
         fab = view.findViewById(R.id.fab)
-        // 念の為、初期化チェック
+        recyclerView = view.findViewById(R.id.recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(context)
+
+        val decoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
+        recyclerView.addItemDecoration(decoration)
+
         if (::fab.isInitialized) {
             fab.setOnClickListener {
                 val intent = Intent(requireActivity(), TransactionEditActivity::class.java)
@@ -66,27 +67,10 @@ class TransactionFragment : Fragment() {
     private fun setData() {
         lifecycleScope.launch {
             transactionsDatas = TransactionsService().getTransactions(realm)
+            transactionsGroupDatas = TransactionsService().groupTransactionsByDate(transactionsDatas)
+            adapter = TransactionsGroupAdapter(transactionsGroupDatas)
+            recyclerView.adapter = adapter
             Log.d("data", "${transactionsDatas.size}")
         }
-    }
-
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment TransactionFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            TransactionFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
     }
 }
