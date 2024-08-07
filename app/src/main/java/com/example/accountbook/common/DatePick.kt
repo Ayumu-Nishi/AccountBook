@@ -10,7 +10,7 @@ import androidx.fragment.app.DialogFragment
 import com.example.accountbook.RegisterActivity
 
 
-class DatePick: DialogFragment(), DatePickerDialog.OnDateSetListener{
+class DatePick(private val initialYear: Int, private val initialMonth: Int, private val initialDay: Int) : DialogFragment(), DatePickerDialog.OnDateSetListener {
 
     interface DatePickerListener {
         fun onDateSet(year: Int, month: Int, day: Int)
@@ -19,13 +19,8 @@ class DatePick: DialogFragment(), DatePickerDialog.OnDateSetListener{
     private lateinit var listener: DatePickerListener
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val calendar = Calendar.getInstance()
-        val year = calendar.get(Calendar.YEAR)
-        val month = calendar.get(Calendar.MONTH)
-        val day = calendar.get(Calendar.DAY_OF_MONTH)
-        // depreacatedなのでいつか修正したいが対案がない（公式が置き換え先に指定しているものはドラムロールはなさそう）
         val datePickerDialog = DatePickerDialog(
-            requireContext(), AlertDialog.THEME_HOLO_LIGHT, this, year, month, day
+            requireContext(), AlertDialog.THEME_HOLO_LIGHT, this, initialYear, initialMonth, initialDay
         )
         datePickerDialog.datePicker.minDate = getBeforeYear(-120) // 120年前
         datePickerDialog.datePicker.maxDate = System.currentTimeMillis() // 現在
@@ -53,5 +48,4 @@ class DatePick: DialogFragment(), DatePickerDialog.OnDateSetListener{
         calender.add(Calendar.YEAR, int)
         return calender.timeInMillis
     }
-
 }

@@ -7,10 +7,14 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.accountbook.Data.TransactionsData
 import com.example.accountbook.Data.TransactionsGroupData
 import com.example.accountbook.R
 
-class TransactionsGroupAdapter(private val transactionGroups: List<TransactionsGroupData>) : RecyclerView.Adapter<TransactionsGroupAdapter.DateGroupViewHolder>() {
+class TransactionsGroupAdapter(
+    private val transactionGroups: List<TransactionsGroupData>,
+    private val onTransactionClick: (TransactionsData) -> Unit
+) : RecyclerView.Adapter<TransactionsGroupAdapter.DateGroupViewHolder>() {
 
     class DateGroupViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val dateTextView: TextView = view.findViewById(R.id.rowTransactionDateTextView)
@@ -27,7 +31,9 @@ class TransactionsGroupAdapter(private val transactionGroups: List<TransactionsG
         holder.dateTextView.text = transactionGroup.date
 
         holder.transactionRecyclerView.layoutManager = LinearLayoutManager(holder.itemView.context)
-        holder.transactionRecyclerView.adapter = TransactionsAdapter(transactionGroup.transactions)
+        holder.transactionRecyclerView.adapter = TransactionsAdapter(transactionGroup.transactions) { transaction ->
+            onTransactionClick(transaction) // クリックされたアイテムの transactionId を返す
+        }
         Log.d("TransactionsGroupAdapter", "Position: $position, Transaction: $transactionGroup")
     }
 

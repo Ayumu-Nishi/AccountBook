@@ -1,5 +1,6 @@
 package com.example.accountbook.Service
 
+import android.util.Log
 import com.example.accountbook.Data.TransactionsData
 import com.example.accountbook.Data.TransactionsGroupData
 import com.example.accountbook.Entity.TransactionsEntity
@@ -47,7 +48,29 @@ class TransactionsService {
         return withContext(Dispatchers.IO) {
             // 全件取得
             val entities = realm.query<TransactionsEntity>().find()
+            Log.d("get", "target: ${entities}")
             entities.map { fromEntityToData(it) } // EntitiesをDataに変換
+        }
+    }
+
+    suspend fun deleteTransactions(realm: Realm, id: String) {
+        withContext(Dispatchers.IO) {
+            realm.write {
+                val frozenEntity = realm.query<TransactionsEntity>("transactionId == $0", id).find().firstOrNull()
+                if (frozenEntity != null) {
+                    val liveEntity = findLatest(frozenEntity)
+                    if (liveEntity != null) {
+                        Log.d("delete", "target: ${liveEntity}")
+                        delete(liveEntity)
+                        val afterEntity = realm.query<TransactionsEntity>().find()
+                        Log.d("delete", "after: ${afterEntity}")
+                    } else {
+                        Log.e("delete", "Live entity not found for frozen entity with ID: $id")
+                    }
+                } else {
+                    Log.e("delete", "Entity with ID $id not found.")
+                }
+            }
         }
     }
 

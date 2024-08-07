@@ -23,6 +23,7 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import java.util.Calendar
 
 class RegisterActivity : AppCompatActivity(), DatePick.DatePickerListener {
 
@@ -42,8 +43,14 @@ class RegisterActivity : AppCompatActivity(), DatePick.DatePickerListener {
 
         // 生年月日選択ボタン
         val birthdaySelectButton = findViewById<Button>(R.id.birthdaySelectButton)
+        // 当日の日付を初期値として使用
+        val initialDate = Calendar.getInstance()
         birthdaySelectButton.setOnClickListener {
-            val dateFragment = DatePick()
+            val dateFragment = DatePick(
+                initialDate.get(Calendar.YEAR),
+                initialDate.get(Calendar.MONTH),
+                initialDate.get(Calendar.DAY_OF_MONTH)
+            )
             dateFragment.show(supportFragmentManager, "datePicker")
         }
 

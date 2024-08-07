@@ -42,6 +42,11 @@ class TransactionFragment : Fragment() {
         setData()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        realm.close()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -68,7 +73,11 @@ class TransactionFragment : Fragment() {
         lifecycleScope.launch {
             transactionsDatas = TransactionsService().getTransactions(realm)
             transactionsGroupDatas = TransactionsService().groupTransactionsByDate(transactionsDatas)
-            adapter = TransactionsGroupAdapter(transactionsGroupDatas)
+            adapter = TransactionsGroupAdapter(transactionsGroupDatas) { transaction ->
+                val intent = Intent(requireActivity(), TransactionEditActivity::class.java)
+                intent.putExtra("TRANSACTION_DATA", transaction) // transactionsData を渡す
+                startActivity(intent)
+            }
             recyclerView.adapter = adapter
             Log.d("data", "${transactionsDatas.size}")
         }

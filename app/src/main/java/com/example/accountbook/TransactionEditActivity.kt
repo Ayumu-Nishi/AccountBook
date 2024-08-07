@@ -28,6 +28,9 @@ import com.example.accountbook.Service.TransactionsService
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class TransactionEditActivity : ParentActivity(), DatePick.DatePickerListener {
 
@@ -42,9 +45,13 @@ class TransactionEditActivity : ParentActivity(), DatePick.DatePickerListener {
 
     var categories = expensesCategories
 
-    private var selectedCategoryId: Int? = null
+    private var selectedCategoryId: Int = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // API33よりdeprecate
+        intent.getParcelableExtra<TransactionsData>("TRANSACTION_DATA", )?.let {
+            transactionsData = it
+        }
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_transaction_edit)
 
@@ -77,6 +84,7 @@ class TransactionEditActivity : ParentActivity(), DatePick.DatePickerListener {
 
         // Spinnerにカテゴリを設定
         setCategory(categorySpinner)
+        categorySpinner.setSelection(transactionsData.categoryType - 1)
 
         categorySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
@@ -86,16 +94,39 @@ class TransactionEditActivity : ParentActivity(), DatePick.DatePickerListener {
 
             override fun onNothingSelected(parent: AdapterView<*>) {
                 // 選択がクリアされた場合の処理
-                selectedCategoryId = null
+                selectedCategoryId = 1
             }
         }
 
+        // 日付テキスト
+        val datetext = findViewById<TextView>(R.id.dateDisplayTextView)
+        datetext.text = transactionsData.date ?: getString(R.string.dateDisplayLabel)
         // 日付選択ボタン
         val dateSelectButton = findViewById<Button>(R.id.dateSelectButton)
+        // 当日の日付を初期値として使用
+        val initialDate = Calendar.getInstance()
+        // transactionsData.dateを取得し、存在すればinitialDateに設定
+        val transactionsDataDate: String? = transactionsData?.date
+        transactionsDataDate?.let {
+            val dateFormat = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault())
+            val date = dateFormat.parse(it)
+            date?.let { initialDate.time = it }
+        }
         dateSelectButton.setOnClickListener {
-            val dateFragment = DatePick()
+            val dateFragment = DatePick(
+                initialDate.get(Calendar.YEAR),
+                initialDate.get(Calendar.MONTH),
+                initialDate.get(Calendar.DAY_OF_MONTH)
+            )
             dateFragment.show(supportFragmentManager, "datePicker")
         }
+
+        // 金額テキスト
+        val amountText = findViewById<EditText>(R.id.amountEditText)
+        amountText.setText(transactionsData.amount?.toString() ?: "")
+
+        val contentText = findViewById<EditText>(R.id.contentEditText)
+        contentText.setText(transactionsData.content ?: "")
 
         // 登録ボタン
         val registerButton = findViewById<Button>(R.id.transactionRegisterButton)
@@ -187,7 +218,21 @@ class TransactionEditActivity : ParentActivity(), DatePick.DatePickerListener {
     // 削除ボタン押下時
     override fun onRightContainerClicked() {
         super.onRightContainerClicked()
-        // 削除処理
+        AlertDialog.Builder(this)
+            .setTitle("削除確認")
+            .setMessage("本当に削除しますか？")
+            .setPositiveButton("OK") { _, _ ->
+                // 削除処理
+                if (transactionsData.transactionId.isNotEmpty()) {
+                    lifecycleScope.launch {
+                        TransactionsService().deleteTransactions(realm, transactionsData.transactionId)
+                        // 画面を戻す
+                        onBackPressedDispatcher.onBackPressed()
+                    }
+                }
+            }
+            .setNegativeButton("キャンセル", null)
+            .show()
     }
 
     // 登録ボタン押下時
@@ -256,37 +301,37 @@ class TransactionEditActivity : ParentActivity(), DatePick.DatePickerListener {
     private fun isValidate(): Boolean {
         var isValid = true
 
-        // カテゴリの入力チェック
-        if (transactionsData.categoryType == null) {
-            val errorLabel = findViewById<TextView>(R.id.categoryErrorLabel)
-            errorLabel.text = getString(R.string.validError_balance_null)
-            isValid = false
-        }
-
         // 日付の入力チェック
+        val dateErrorLabel = findViewById<TextView>(R.id.dateErrorLabel)
         if (transactionsData.date == null) {
-            val errorLabel = findViewById<TextView>(R.id.dateErrorLabel)
-            errorLabel.text = getString(R.string.validError_date_null)
+            dateErrorLabel.text = getString(R.string.validError_date_null)
             isValid = false
+        } else {
+            dateErrorLabel.text = ""
         }
 
         // 金額の入力チェック
+        val amountErrorLabel = findViewById<TextView>(R.id.amountErrorLabel)
         if (transactionsData.amount == null) {
-            val errorLabel = findViewById<TextView>(R.id.amountErrorLabel)
-            errorLabel.text = getString(R.string.validError_amount_null)
+            amountErrorLabel.text = getString(R.string.validError_amount_null)
             isValid = false
+        } else {
+            amountErrorLabel.text = ""
         }
 
         // 内容の入力チェック
+        val contentErrorLabel = findViewById<TextView>(R.id.contentErrorLabel)
         if (transactionsData.content.isNullOrBlank()) {
-            val errorLabel = findViewById<TextView>(R.id.contentErrorLabel)
-            errorLabel.text = getString(R.string.validError_content_null)
+            contentErrorLabel.text = getString(R.string.validError_content_null)
             isValid = false
+        } else {
+            contentErrorLabel.text = ""
         }
 
         return isValid
     }
 
+    // データ保存処理
     private fun saveData() {
         lifecycleScope.launch {
             TransactionsService().saveTransaction(realm, transactionsData)

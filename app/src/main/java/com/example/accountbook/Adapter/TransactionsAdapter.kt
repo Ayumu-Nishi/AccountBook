@@ -11,8 +11,12 @@ import com.example.accountbook.Constants.CategoryConstants.expensesCategories
 import com.example.accountbook.Constants.CategoryConstants.incomeCategories
 import com.example.accountbook.Data.TransactionsData
 import com.example.accountbook.R
+import java.text.DecimalFormat
 
-class TransactionsAdapter(private val transactions: List<TransactionsData>) : RecyclerView.Adapter<TransactionsAdapter.TransactionsViewHolder>() {
+class TransactionsAdapter(
+    private val transactions: List<TransactionsData>,
+    private val onItemClick: (TransactionsData) -> Unit
+) : RecyclerView.Adapter<TransactionsAdapter.TransactionsViewHolder>() {
 
     class TransactionsViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val categoryImageView: ImageView = view.findViewById(R.id.rowCategoryImageView)
@@ -30,11 +34,19 @@ class TransactionsAdapter(private val transactions: List<TransactionsData>) : Re
         val transaction = transactions[position]
         val isExpense = transaction.balanceType == 0
         val icon = if (isExpense) R.drawable.shopping_cart_24 else R.drawable.savings_24
+        // 金額のカンマ区切り
+        val decimalFormat = DecimalFormat("#,###")
+        val formatAmount = decimalFormat.format(transaction.amount)
+
         holder.categoryImageView.setImageResource(icon)
         holder.categoryNameTextView.text = if (isExpense) expensesCategories[transaction.categoryType] else incomeCategories[transaction.categoryType]
         holder.contentTextView.text = transaction.content
-        holder.amountTextView.text = if (isExpense) "-${transaction.amount}円" else "+${transaction.amount}円"
+        holder.amountTextView.text = if (isExpense) "-${formatAmount}円" else "+${formatAmount}円"
         Log.d("TransactionsAdapter", "Position: $position, Transaction: $transaction")
+
+        holder.itemView.setOnClickListener {
+            onItemClick(transaction) // クリックされたアイテムの transactionId を返す
+        }
     }
 
     override fun getItemCount(): Int = transactions.size
