@@ -32,7 +32,7 @@ class TransactionsCategoryAdapter(
     override fun onBindViewHolder(holder: TransactionsViewHolder, position: Int) {
         val transaction = transactions[position]
         val isExpense = transaction.balanceType == 0
-        val icon = if (isExpense) R.drawable.shopping_cart_24 else R.drawable.savings_24
+        val icon = if (isExpense) CategoryConstants.expensesIcons[transaction.categoryType] ?: R.drawable.shopping_cart_24 else CategoryConstants.incomeIcons[transaction.categoryType] ?: R.drawable.savings_24
         // 金額のカンマ区切り
         val decimalFormat = DecimalFormat("#,###")
         val formatAmount = decimalFormat.format(transaction.amount)
