@@ -1,6 +1,7 @@
 package com.example.accountbook
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -10,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,11 +19,19 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.accountbook.Adapter.TransactionsAdapter
 import com.example.accountbook.Adapter.TransactionsCategoryAdapter
 import com.example.accountbook.Adapter.TransactionsGroupAdapter
+import com.example.accountbook.Constants.CategoryConstants
 import com.example.accountbook.Data.TransactionsData
 import com.example.accountbook.Data.TransactionsCategoryGroupData
 import com.example.accountbook.Data.TransactionsMonthGroupData
 import com.example.accountbook.Entity.TransactionsEntity
 import com.example.accountbook.Service.TransactionsService
+import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.formatter.PercentFormatter
+import com.github.mikephil.charting.formatter.ValueFormatter
+import com.github.mikephil.charting.utils.ColorTemplate
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 import kotlinx.coroutines.launch
@@ -40,6 +50,7 @@ class BalanceFragment : Fragment() {
     private lateinit var incomeTextView: TextView
     private lateinit var spendingTextView: TextView
     private lateinit var balanceTextView: TextView
+    private lateinit var pieChart: PieChart
     private var ymTextView: TextView? = null
     private val config = RealmConfiguration.Builder(schema = setOf(TransactionsEntity::class)).build()
     private val realm = Realm.open(config)
@@ -48,6 +59,7 @@ class BalanceFragment : Fragment() {
     private var transactionsCategoryIncomeDatas: List<TransactionsCategoryGroupData> = listOf()
     private var transactionsCategorySpendingDatas: List<TransactionsCategoryGroupData> = listOf()
     private var transactionsMonthDatas: List<TransactionsMonthGroupData> = listOf()
+    private var showDatas: List<TransactionsCategoryGroupData> = listOf()
     private var currentMonth = SimpleDateFormat("yyyy年MM月", Locale.getDefault()).format(Date())
     private lateinit var showMonth: String
     private var balanceType = 0
@@ -103,6 +115,8 @@ class BalanceFragment : Fragment() {
         incomeTextView = view.findViewById(R.id.incomeValueTextView)
         spendingTextView = view.findViewById(R.id.spendingValueTextView)
         balanceTextView = view.findViewById(R.id.balanceValueTextView)
+        // 円グラフの取得
+        pieChart = view.findViewById(R.id.pieChart)
         return view
     }
 
@@ -148,7 +162,11 @@ class BalanceFragment : Fragment() {
             Log.d("transactionsMonthDatas", "${transactionsMonthDatas}")
             val currentMonthIndex = transactionsMonthDatas.indexOfFirst { it.date == showMonth }
             Log.d("currentMonthIndex", "${currentMonthIndex}")
-            var showDatas: List<TransactionsCategoryGroupData> = listOf()
+            // クラス変数の初期化
+            showDatas = listOf()
+            transactionsCategorySpendingDatas = listOf()
+            transactionsCategoryIncomeDatas = listOf()
+            // 該当月のデータが存在すれば格納
             if (currentMonthIndex >= 0) {
                 transactionsCategoryDatas = transactionsMonthDatas[currentMonthIndex].transactions
                 transactionsCategorySpendingDatas =
@@ -168,6 +186,7 @@ class BalanceFragment : Fragment() {
             ymTextView?.text = showMonth
             updateRightButton()
             updateBalanceText()
+            updatePieChart()
         }
     }
 
@@ -212,6 +231,71 @@ class BalanceFragment : Fragment() {
             balanceTextView.setTextColor(getResources().getColor(R.color.black))
         }
 
+    }
+
+    private fun updatePieChart() {
+        Log.d("showdata", "${showDatas.size}")
+        if (showDatas.size > 0) {
+            pieChart.isVisible = true
+
+            // カテゴリごとの金額を集計
+            val categoryAmounts = mutableMapOf<String, Double>()
+            val totalAmount = showDatas.sumOf { it.amount }
+
+            showDatas.forEach { transaction ->
+                val categoryName = if (transaction.balanceType == 0) {
+                    CategoryConstants.expensesCategories[transaction.categoryType]
+                } else {
+                    CategoryConstants.incomeCategories[transaction.categoryType]
+                }
+
+                categoryName?.let {
+                    val currentAmount = categoryAmounts[it] ?: 0.0
+                    categoryAmounts[it] = currentAmount + transaction.amount
+                }
+            }
+
+            // ①Entryにデータ格納
+            val entries = mutableListOf<PieEntry>()
+            categoryAmounts.forEach { (categoryName, amount) ->
+                val percentage = (amount / totalAmount) * 100
+                entries.add(PieEntry(percentage.toFloat(), categoryName))
+            }
+
+            // ②PieDataSetにデータ格納
+            val dataSet = PieDataSet(entries, "カテゴリ別の割合")
+            // ③DataSetのフォーマット指定
+            val percentFormatter = object : ValueFormatter() {
+                override fun getFormattedValue(value: Float): String {
+                    val formattedValue = String.format("%.1f", value) // 小数点第1位まで表示
+                    return "$formattedValue%" // パーセント記号を追加
+                }
+            }
+            dataSet.valueFormatter = percentFormatter
+            dataSet.colors = ColorTemplate.MATERIAL_COLORS.toList()
+
+            // ④PieDataにPieDataSet格納
+            val pieData = PieData(dataSet)
+            // ⑤PieChartにPieData格納
+            pieChart.data = pieData
+
+            // ⑥Chartのフォーマット指定
+            // PieChart の description を非表示にする
+            pieChart.description.isEnabled = false // 右下の説明を非表示
+            pieChart.legend.isEnabled = false // 凡例を非表示
+            pieChart.setDrawEntryLabels(true) // データラベルを表示
+            pieChart.setEntryLabelTextSize(16f) // データラベルのタイトルのフォントサイズ
+            pieChart.setEntryLabelColor(Color.BLACK) // データラベルのタイトルのテキストカラー
+
+            dataSet.setValueLineColor(Color.BLACK) // データラベルの値に引く線の色
+            dataSet.setValueTextColor(Color.BLACK) // データラベルの値のテキストカラー
+            dataSet.setValueTextSize(16f) // データラベルの値のフォントサイズ
+
+            // ⑦PieChart更新
+            pieChart.invalidate()
+        } else {
+            pieChart.isVisible = false
+        }
     }
 
     private fun getDate(dateStr: String, month: Int): String? {
